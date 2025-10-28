@@ -1,6 +1,5 @@
 import flet as ft
 from UI.alert import AlertManager
-
 '''
     VIEW:
     - Rappresenta l'interfaccia utente
@@ -64,6 +63,8 @@ class View:
 
         # Altri Pulsanti da implementare (es. "Mostra" e "Cerca")
         # TODO
+        pulsante_mostra = ft.ElevatedButton("Mostra", on_click=self.controller.)
+        pulsante_cerca = ft.ElevatedButton()
 
         # --- LAYOUT ---
         self.page.add(
@@ -83,6 +84,9 @@ class View:
 
             # Sezione 3
             # TODO
+            ft.Text("Automobili", size=20),
+
+
 
             # Sezione 4
             # TODO
