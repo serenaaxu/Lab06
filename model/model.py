@@ -36,12 +36,27 @@ class Autonoleggio:
             :return: una lista con tutte le automobili presenti oppure None
         """
         # TODO
-        cnx = mysql.connector.connect(...)
+        cnx = mysql.connector.connect(host="localhost",
+                                      user="root",
+                                      passwd="",
+                                      database="automobile")
         cursor_dict = cnx.cursor(dictionary=True)
-        query = """ SELECT * FROM user """
-        cursor_dict.execute(query)
+        cursor_dict.execute("SELECT * FROM automobile")
+
+        automobili = []
         for row in cursor_dict:
-            print(row["id"], row["name"])
+            auto = Automobile(
+                codice=row["codice"],
+                marca=row["marca"],
+                modello=row["modello"],
+                anno=row["anno"],
+                posti=row["posti"],
+                disponibile=bool(row["disponibile"])
+            )
+
+        cursor_dict.close()
+        cnx.close()
+        return automobili if automobili else None
 
 
     def cerca_automobili_per_modello(self, modello) -> list[Automobile] | None:
@@ -51,3 +66,28 @@ class Autonoleggio:
             :return: una lista con tutte le automobili di marca e modello indicato oppure None
         """
         # TODO
+        cnx = mysql.connector.connect(host="localhost",
+                                      user="root",
+                                      passwd="",
+                                      database="automobile")
+        cursor_dict = cnx.cursor(dictionary=True)
+
+        query = """SELECT * FROM automobile WHERE modello = %s"""
+        cursor_dict.execute(query, (modello,))
+
+        automobili = []
+        for row in cursor_dict:
+            auto = Automobile(
+                codice=row["codice"],
+                marca=row["marca"],
+                modello=row["modello"],
+                anno=row["anno"],
+                posti=row["posti"],
+                disponibile=bool(row["disponibile"])
+            )
+            automobili.append(auto)
+
+        cursor_dict.close()
+        cnx.close()
+
+        return automobili if automobili else None
