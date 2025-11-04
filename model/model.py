@@ -36,58 +36,71 @@ class Autonoleggio:
             :return: una lista con tutte le automobili presenti oppure None
         """
         # TODO
-        cnx = mysql.connector.connect(host="localhost",
-                                      user="root",
-                                      passwd="",
-                                      database="automobile")
-        cursor_dict = cnx.cursor(dictionary=True)
-        cursor_dict.execute("SELECT * FROM automobile")
+        try:
+            cnx = get_connection() 
+            if cnx is None:
+                print("Errore di connessione")
+                return None
+                
+            cursor_dict = cnx.cursor(dictionary=True)
+            cursor_dict.execute("SELECT * FROM automobile ORDER BY marca, modello")
 
-        automobili = []
-        for row in cursor_dict:
-            auto = Automobile(
-                codice=row["codice"],
-                marca=row["marca"],
-                modello=row["modello"],
-                anno=row["anno"],
-                posti=row["posti"],
-                disponibile=bool(row["disponibile"])
-            )
+            result = []
+            for row in cursor_dict:
+                auto = Automobile(
+                    codice=row["codice"],
+                    marca=row["marca"],
+                    modello=row["modello"],
+                    anno=row["anno"],
+                    posti=row["posti"],
+                    disponibile=bool(row["disponibile"])
+                )
+                result.append(auto)
 
-        cursor_dict.close()
-        cnx.close()
-        return automobili if automobili else None
+            cursor_dict.close()
+            cnx.close()
+            return result if result else None
+            
+        except Exception as e:
+            print(f"Errore in get_automobili: {e}")
+            return None
 
 
-    def cerca_automobili_per_modello(self, modello) -> list[Automobile] | None:
+    def get_automobili_per_modello(self, modello) -> list[Automobile] | None:
         """
             Funzione che recupera una lista con tutte le automobili presenti nel database di una certa marca e modello
             :param modello: il modello dell'automobile
             :return: una lista con tutte le automobili di marca e modello indicato oppure None
         """
         # TODO
-        cnx = mysql.connector.connect(host="localhost",
-                                      user="root",
-                                      passwd="",
-                                      database="automobile")
-        cursor_dict = cnx.cursor(dictionary=True)
+        try:
+            cnx = get_connection()
+            if cnx is None:
+                print("Errore di connessione")
+                return None
+                
+            cursor_dict = cnx.cursor(dictionary=True)
 
-        query = """SELECT * FROM automobile WHERE modello = %s"""
-        cursor_dict.execute(query, (modello,))
+            query = """SELECT * FROM automobile WHERE modello = %s ORDER BY marca, anno DESC"""
+            cursor_dict.execute(query, (modello,))
+            
+            result = []
+            for row in cursor_dict:
+                auto = Automobile(
+                    codice=row["codice"],
+                    marca=row["marca"],
+                    modello=row["modello"],
+                    anno=row["anno"],
+                    posti=row["posti"],
+                    disponibile=bool(row["disponibile"])
+                )
+                result.append(auto)
 
-        automobili = []
-        for row in cursor_dict:
-            auto = Automobile(
-                codice=row["codice"],
-                marca=row["marca"],
-                modello=row["modello"],
-                anno=row["anno"],
-                posti=row["posti"],
-                disponibile=bool(row["disponibile"])
-            )
-            automobili.append(auto)
+            cursor_dict.close()
+            cnx.close()
 
-        cursor_dict.close()
-        cnx.close()
-
-        return automobili if automobili else None
+            return result if result else None
+            
+        except Exception as e:
+            print(f"Errore in get_automobili_per_modello: {e}")
+            return None

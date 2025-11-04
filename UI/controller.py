@@ -29,8 +29,22 @@ class Controller:
 
     # Altre Funzioni Event Handler
     # TODO
-    def mostra_automobili(self, e):
-        return self._model.get_automobili()
+    def handle_mostra_automobili(self, e):
+        try:
+            lista_automobili = self._model.get_automobili()
+            self._view.update_lista_auto(lista_automobili)
+        except Exception as e:
+            self._view.show_alert(f"❌ Errore nel caricamento delle auto: {e}")
 
-    def cerca_automobili(self, e):
-        return self._model.cerca_automobili_per_modello()
+    def handle_cerca_automobili(self, e):
+        modello_ricerca = self._view.input_modello_auto.value.strip()
+        
+        if not modello_ricerca:
+            self._view.show_alert("Inserire un modello da cercare.")
+            return
+            
+        try:
+            lista_filtrata = self._model.get_automobili_by_modello(modello_ricerca)
+            self._view.update_lista_ricerca(lista_filtrata)
+        except Exception as e:
+            self._view.show_alert(f"❌ Errore durante la ricerca: {e}")

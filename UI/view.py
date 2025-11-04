@@ -46,16 +46,16 @@ class View:
         )
 
         # TextField per responsabile
-        self.input_responsabile = ft.TextField(value=self.controller.get_responsabile(), label="Responsabile")
+        self.input_responsabile = ft.TextField(value=self.controller.get_responsabile(), label="Responsabile",width=400)
 
         # ListView per mostrare la lista di auto aggiornata
-        self.lista_auto = ft.ListView(expand=True, spacing=5, padding=10, auto_scroll=True)
+        self.lista_auto = ft.ListView(spacing=5, padding=10, auto_scroll=True, height=250, width=600)
 
         # TextField per ricerca auto per modello
-        self.input_modello_auto = ft.TextField(label="Modello")
+        self.input_modello_auto = ft.TextField(label="Modello", width=400)
 
         # ListView per mostrare il risultato della ricerca auto per modello
-        self.lista_auto_ricerca = ft.ListView(expand=True, spacing=5, padding=10, auto_scroll=True)
+        self.lista_auto_ricerca = ft.ListView(spacing=5, padding=10, auto_scroll=True, height=250, width=600)
 
         # --- PULSANTI e TOGGLE associati a EVENTI ---
         self.toggle_cambia_tema = ft.Switch(label="Tema scuro", value=True, on_change=self.cambia_tema)
@@ -63,8 +63,8 @@ class View:
 
         # Altri Pulsanti da implementare (es. "Mostra" e "Cerca")
         # TODO
-        self.pulsante_mostra = ft.ElevatedButton("Mostra", on_click=self.controller.mostra_automobili)
-        self.pulsante_cerca = ft.ElevatedButton("Cerca", on_click = self.controller.cerca_automobili)
+        self.pulsante_mostra = ft.ElevatedButton("Mostra", on_click=self.controller.handle_mostra_automobili)
+        self.pulsante_cerca = ft.ElevatedButton("Cerca", on_click = self.controller.handle_cerca_automobili)
 
         # --- LAYOUT ---
         self.page.add(
@@ -85,13 +85,25 @@ class View:
             # Sezione 3
             # TODO
             ft.Text("Automobili", size=20),
-            ft.Row(spacing=200, controls = (self.pulsante_mostra,
-                                           ft.Text("Automobili", size=20))),
+            self.pulsante_mostra,
+            ft.Row(
+                controls=[self.lista_auto],
+                alignment=ft.MainAxisAlignment.CENTER
+            ),
             ft.Divider(),
 
             # Sezione 4
             # TODO
-            ft.Text("Cerca Automobile", size=20)
+            ft.Text("Cerca Automobile", size=20),
+            ft.Row(
+                controls=[self.input_modello_auto, self.pulsante_cerca],
+                alignment=ft.MainAxisAlignment.CENTER,
+                spacing=20
+            ),
+            ft.Row(
+                controls=[self.lista_auto_ricerca],
+                alignment=ft.MainAxisAlignment.CENTER
+            )
 
         )
 
@@ -99,3 +111,24 @@ class View:
         self.page.theme_mode = ft.ThemeMode.DARK if self.toggle_cambia_tema.value else ft.ThemeMode.LIGHT
         self.toggle_cambia_tema.label = "Tema scuro" if self.toggle_cambia_tema.value else "Tema chiaro"
         self.page.update()
+    
+    def update_lista_auto(self, automobili):
+        self.lista_auto.controls.clear()
+        if not automobili:
+            self.lista_auto.controls.append(ft.Text("Nessuna automobile trovata nel database."))
+        else:
+            for auto in automobili:
+                stato = "DISPONIBILE" if auto.disponibile else "NON DISPONIBILE"
+                self.lista_auto.controls.append(ft.Text(f"{stato} {auto}"))
+        self.update()
+
+    def update_lista_ricerca(self, automobili):
+        """ Popola la ListView della Sezione 4 con i dati dal controller. """
+        self.lista_auto_ricerca.controls.clear()
+        if not automobili:
+            self.lista_auto_ricerca.controls.append(ft.Text("Nessuna automobile trovata per questo modello."))
+        else:
+            for auto in automobili:
+                stato = "DISPONIBILE" if auto.disponibile else "NON DISPONIBILE"
+                self.lista_auto_ricerca.controls.append(ft.Text(f"{stato} {auto}"))
+        self.update()
