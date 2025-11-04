@@ -66,7 +66,7 @@ class Autonoleggio:
             return None
 
 
-    def get_automobili_per_modello(self, modello) -> list[Automobile] | None:
+    def get_automobili_by_modello(self, modello) -> list[Automobile] | None:
         """
             Funzione che recupera una lista con tutte le automobili presenti nel database di una certa marca e modello
             :param modello: il modello dell'automobile
